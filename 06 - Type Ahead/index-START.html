@@ -6,7 +6,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
+  <div id="test"></div>
   <form class="search-form">
     <input type="text" class="search" placeholder="City or State">
     <ul class="suggestions">
@@ -16,6 +16,50 @@
   </form>
 <script>
 const endpoint = 'https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json';
+const cities = [];
+
+function ajax(url){
+  return new Promise(function(resolve,reject){
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function(){
+      if(xmlhttp.readyState == 4 && xmlhttp.status == 200){
+        const data = JSON.parse(xmlhttp.responseText);
+        resolve(data);
+      }
+    }
+    xmlhttp.open('GET',url,true);
+    xmlhttp.send();
+  });
+}
+ajax(endpoint).then(function (response){
+  cities.push(response);
+});
+
+function numberWithCommas(x) {
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+function findMatches(value, cities){
+  return cities[0].filter(place => place.city.includes(value) || place.state.includes(value));
+}
+function displayMatches(){
+    const matchArray = findMatches(this.value, cities);
+    const html = matchArray.map(place => {
+      const reg = new RegExp(this.value, 'gi');
+      const city = place.city.replace(reg, `<span class="hl">${this.value}</span>`);
+      const state = place.state.replace(reg, `<span class="hl">${this.value}</span>`);
+      return `
+        <li>
+          <span>${city}, ${state}</span>
+          <span>${numberWithCommas(place.population)}</span>
+        </li>
+      `;
+    }).join('');
+    suggestions.innerHTML = html;
+}
+const searchInput = document.querySelector('.search');
+const suggestions = document.querySelector('.suggestions');
+searchInput.addEventListener('change', displayMatches);
+searchInput.addEventListener('keyup', displayMatches);
 
 </script>
 </body>
