@@ -26,7 +26,28 @@
     </div>
 
   <script>
-    // 👀👀👀👀👀👀👀👀👀👀👀👀👀👀👀
+    const triggers = document.querySelectorAll('a');
+    const highlight = document.createElement('span');
+    highlight.classList.add('highlight');
+    document.body.append(highlight);
+
+    function highlightLink() {
+      const linkCoords = this.getBoundingClientRect();
+      const coors = {
+        width: linkCoords.width,
+        height: linkCoords.height,
+        left: linkCoords.left + window.scrollX,
+        top: linkCoords.top + window.scrollY
+      };
+
+      highlight.style.width = `${coors.width}px`;
+      highlight.style.height = `${coors.height}px`;
+      // highlight.style.top = `${coors.top}px`;
+      // highlight.style.left = `${coors.left}px`;
+      highlight.style.transform = `translate(${coors.left}px, ${coors.top}px)`;
+    }
+
+    triggers.forEach(a => a.addEventListener('mouseenter', highlightLink));
   </script>
 </body>
 </html>
